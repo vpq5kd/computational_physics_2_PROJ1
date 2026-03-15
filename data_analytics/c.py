@@ -37,14 +37,14 @@ for N in Ns:
     iterator+=1
 
 ax[0].set_xlabel(r"$T$")
-ax[0].set_ylabel(r"$\chi$",rotation = 0, labelpad=labelpad)
-ax[0].set_ylim(0,400)
+ax[0].set_ylabel(r"$c$",rotation = 0, labelpad=labelpad)
+ax[0].set_ylim(0,3)
 ax[0].legend(loc='upper right')
 
 ax[1].set_xlabel(r"$(T-T_{c})L^{\frac{1}{\nu}}$")
-ax[1].set_ylabel(r"$\chi L^{\frac{-\gamma}{\nu}}$",rotation=0,labelpad=labelpad)
+ax[1].set_ylabel(r"$\frac{c}{\ln(L)}$",rotation=0,labelpad=labelpad)
 ax[1].set_xlim(-20,30)
-ax[1].set_ylim(0,0.05)
+ax[1].set_ylim(0,0.6)
 ax[1].legend(loc='upper right')
 
 fig.tight_layout()
