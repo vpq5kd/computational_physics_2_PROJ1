@@ -103,7 +103,7 @@ def temperature_logic(args):
 
 def run_sim(N, melting_iterations, measuring_iterations):
     
-    temperature_array = np.linspace(0.1, 5.1, 100)[::-1]
+    temperature_array = np.linspace(1.8, 2.8, 50)[::-1]
     
     args = [(N, T, melting_iterations, measuring_iterations) for T in temperature_array]
     
@@ -131,16 +131,13 @@ def main():
         
         color = colors[color_iterator]
         temperature_array, wolff_energy_array, wolff_energy_array_squared, magnetization_array, magnetization_array_squared, magnetization_array_biquadrated = run_sim(N, melting_iterations, measuring_iterations)
-        B_4 = 1 - (magnetization_array_biquadrated/(3*magnetization_array_squared)**2)
+        B_4 = 1 - (magnetization_array_biquadrated/(3*(magnetization_array_squared)**2))
         ax[0].plot(temperature_array, B_4)
-        ax[1].plot(temperature_array, wolff_energy_array/N**2)
         color_iterator +=1
 
     ax[0].set_xlabel("T")
     ax[0].set_ylabel(r"$B_{4}$", rotation = 0, labelpad=labelpad)
-    ax[1].set_xlabel("T")
-    ax[1].set_ylabel(r"Average Energy", rotation = 0, labelpad=labelpad)
-    
+    ax[0].set_ylim(0.2, 0.7) 
     fig.legend(loc='upper right')
     fig.tight_layout()
     plt.show()
