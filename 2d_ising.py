@@ -10,6 +10,7 @@ rng = np.random.default_rng()
 parser = argparse.ArgumentParser('2D ising simulation')
 parser.add_argument('--melting_iterations', type=int)
 parser.add_argument('--measuring_iterations', type=int)
+parser.add_argument('--outfile_location',type=str)
 args = parser.parse_args()
 
 def hamiltonian(spins, J=1):
@@ -27,6 +28,9 @@ def hamiltonian(spins, J=1):
             energy += -J * s * down
             
     return energy
+
+def vectorized_hamiltonian(spins, J=1):
+    return -J * (np.sum(spins * np.roll(spins, 1, axis=0)) + np.sum(spins * np.roll(spins, 1, axis=1)))
 
 def magnetization(spins):
     return np.sum(spins)
@@ -83,9 +87,9 @@ def wolff_cluster(N, T, spins, melting_iterations, measuring_iterations):
     
     for i in range(measuring_iterations):
         wolff_cluster_logic(N, T, spins)
-        temp_energy_array.append(hamiltonian(spins))
+        temp_energy_array.append(vectorized_hamiltonian(spins))
         temp_magnetization_array.append(magnetization(spins))
-
+    
     return np.mean(temp_energy_array), np.mean(np.array(temp_energy_array)**2), np.mean(np.array(temp_magnetization_array)), np.mean(np.array(temp_magnetization_array)**2), np.mean(np.array(temp_magnetization_array)**4)
 
 def temperature_logic(args):
@@ -119,28 +123,12 @@ def main():
     melting_iterations = args.melting_iterations
     measuring_iterations = args.measuring_iterations
     
-    fig, ax = plt.subplots(1,2)
 
-    colors = ['green', 'black', 'purple']
-    color_iterator = 0
-
-    markersize=3
-    labelpad=15
-    
     for N in Ns:
         
-        color = colors[color_iterator]
         temperature_array, wolff_energy_array, wolff_energy_array_squared, magnetization_array, magnetization_array_squared, magnetization_array_biquadrated = run_sim(N, melting_iterations, measuring_iterations)
-        B_4 = 1 - (magnetization_array_biquadrated/(3*(magnetization_array_squared)**2))
-        ax[0].plot(temperature_array, B_4)
-        color_iterator +=1
 
-    ax[0].set_xlabel("T")
-    ax[0].set_ylabel(r"$B_{4}$", rotation = 0, labelpad=labelpad)
-    ax[0].set_ylim(0.2, 0.7) 
-    fig.legend(loc='upper right')
-    fig.tight_layout()
-    plt.show()
+        np.savez(f"{args.outfile_location}/ising_results_{N}.npz", T = temperature_array, energy=wolff_energy_array, energy2 = wolff_energy_array_squared, magnetization = magnetization_array, magnetization2=magnetization_array_squared, magnetization4=magnetization_array_biquadrated)
 
 if __name__ == "__main__":
     main()
