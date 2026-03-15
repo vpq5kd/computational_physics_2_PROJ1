@@ -18,7 +18,7 @@ Ns = [30,60,120]
 T_c = 2.269
 
 for N in Ns:
-    data = np.load(f"{outfile_location}/ising_results_{N}.npz")
+    data = np.load(f"{args.outfile_location}/ising_results_{N}.npz")
     T = data["T"]
     energy = data["energy"]
     energy2 = data["energy2"]
