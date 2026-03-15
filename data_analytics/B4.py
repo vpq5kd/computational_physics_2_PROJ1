@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 
+parser = argparse.ArgumentParser('2D ising simulation')
+parser.add_argument('--outfile_location',type=str)
+args = parser.parse_args()
 
 fig, ax = plt.subplots(1,2)
 
@@ -14,29 +18,35 @@ Ns = [30,60,120]
 T_c = 2.269
 
 for N in Ns:
-    data = np.load(f"working_data/ising_results_{N}.npz")
+    data = np.load(f"{outfile_location}/ising_results_{N}.npz")
     T = data["T"]
     energy = data["energy"]
     energy2 = data["energy2"]
     magnetization = data["magnetization"]
     magnetization2 = data["magnetization2"]
     magnetization4 = data["magnetization4"]
+    #magnetizationAbs = data["magnetizationAbs"]
 
     B_4 = 1 - (magnetization4/(3*(magnetization2)**2))
     FSS = (T-T_c)*N
 
     ax[0].plot(T,B_4,color=colors[iterator],label=N)
-    ax[1].plot(T,FSS,color=colors[iterator],marker=markers[iterator],markerfacecolor='None')
+    ax[1].plot(FSS,B_4,color=colors[iterator],marker=markers[iterator],markerfacecolor='None',linestyle='None',label=N)
+
     iterator+=1
 
-ax[0].set_xlabel("Temperature")
+ax[0].set_xlabel(r"$T$")
 ax[0].set_ylabel(r"$B_{4}$",rotation = 0, labelpad=labelpad)
 ax[0].set_ylim(0.2,0.7)
+ax[0].set_xlim(2.1,2.4)
+ax[0].legend(loc='upper right')
 
-ax[1].set_xlabel(r"$(T-T_{c})L^{\frac{1}{v}}$")
+ax[1].set_xlabel(r"$(T-T_{c})L^{\frac{1}{\nu}}$")
 ax[1].set_ylabel(r"$B_{4}$",rotation=0,labelpad=labelpad)
+ax[1].set_xlim(-20,30)
+ax[1].set_ylim(0,0.7)
+ax[1].legend(loc='upper right')
 
-fig.legend(loc='upper right')
 fig.tight_layout()
 
 plt.show()

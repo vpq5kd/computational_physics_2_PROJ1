@@ -82,6 +82,7 @@ def wolff_cluster(N, T, spins, melting_iterations, measuring_iterations):
     
     temp_energy_array = []
     temp_magnetization_array = []
+    
     for i in range(melting_iterations):
         wolff_cluster_logic(N, T, spins)    
     
@@ -90,8 +91,10 @@ def wolff_cluster(N, T, spins, melting_iterations, measuring_iterations):
         temp_energy_array.append(vectorized_hamiltonian(spins))
         temp_magnetization_array.append(magnetization(spins))
     
-    return np.mean(temp_energy_array), np.mean(np.array(temp_energy_array)**2), np.mean(np.array(temp_magnetization_array)), np.mean(np.array(temp_magnetization_array)**2), np.mean(np.array(temp_magnetization_array)**4)
+    e = np.array(temp_energy_array)
+    m = np.array(temp_magnetization_array)
 
+    return np.mean(e), np.mean(e**2), np.mean(m), np.mean(m**2), np.mean(m**4), np.mean(np.abs(m))
 def temperature_logic(args):
     
     N, T, melting_iterations, measuring_iterations = args
@@ -101,9 +104,9 @@ def temperature_logic(args):
 
     spins_wolff = np.ones((N,N))
 
-    wolff_energy, wolff_energy_squared, wolff_magnetization, wolff_magnetization_squared, wolff_magnetization_biquadrated = wolff_cluster(N, T, spins_wolff, melting_iterations, measuring_iterations)
+    wolff_energy, wolff_energy_squared, wolff_magnetization, wolff_magnetization_squared, wolff_magnetization_biquadrated, wolff_magnetization_absolute = wolff_cluster(N, T, spins_wolff, melting_iterations, measuring_iterations)
 
-    return T, wolff_energy, wolff_energy_squared, wolff_magnetization, wolff_magnetization_squared, wolff_magnetization_biquadrated
+    return T, wolff_energy, wolff_energy_squared, wolff_magnetization, wolff_magnetization_squared, wolff_magnetization_biquadrated, wolff_magnetization_absolute
 
 def run_sim(N, melting_iterations, measuring_iterations):
     
@@ -114,8 +117,9 @@ def run_sim(N, melting_iterations, measuring_iterations):
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         results = list(tqdm(executor.map(temperature_logic, args), total=len(args)))
 
-    T_arr, wolff_e_arr, wolff_e_2_arr, wolff_m_arr, wolff_m_2_arr, wolff_m_4_arr = zip(*results)
-    return np.array(T_arr), np.array(wolff_e_arr), np.array(wolff_e_2_arr), np.array(wolff_m_arr), np.array(wolff_m_2_arr), np.array(wolff_m_4_arr)
+    T_arr, wolff_e_arr, wolff_e_2_arr, wolff_m_arr, wolff_m_2_arr, wolff_m_4_arr, wolff_m_abs = zip(*results)
+
+    return np.array(T_arr), np.array(wolff_e_arr), np.array(wolff_e_2_arr), np.array(wolff_m_arr), np.array(wolff_m_2_arr), np.array(wolff_m_4_arr), np.array(wolff_m_abs)
 
 def main():
     
@@ -126,9 +130,9 @@ def main():
 
     for N in Ns:
         
-        temperature_array, wolff_energy_array, wolff_energy_array_squared, magnetization_array, magnetization_array_squared, magnetization_array_biquadrated = run_sim(N, melting_iterations, measuring_iterations)
+        temperature_array, wolff_energy_array, wolff_energy_array_squared, magnetization_array, magnetization_array_squared, magnetization_array_biquadrated, magnetization_array_absolute = run_sim(N, melting_iterations, measuring_iterations)
 
-        np.savez(f"{args.outfile_location}/ising_results_{N}.npz", T = temperature_array, energy=wolff_energy_array, energy2 = wolff_energy_array_squared, magnetization = magnetization_array, magnetization2=magnetization_array_squared, magnetization4=magnetization_array_biquadrated)
+        np.savez(f"{args.outfile_location}/ising_results_{N}.npz", T = temperature_array, energy=wolff_energy_array, energy2 = wolff_energy_array_squared, magnetization = magnetization_array, magnetization2=magnetization_array_squared, magnetization4=magnetization_array_biquadrated, magnetizationAbs=magnetization_array_absolute)
 
 if __name__ == "__main__":
     main()
