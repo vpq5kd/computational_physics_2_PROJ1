@@ -48,6 +48,6 @@ ax[1].set_ylim(0,0.05)
 ax[1].legend(loc='upper right')
 
 fig.tight_layout()
-
+plt.savefig("data_analytics/graphs/chi.png")
 plt.show()
     
