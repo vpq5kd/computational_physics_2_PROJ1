@@ -37,7 +37,7 @@ for N in Ns:
     iterator+=1
 
 ax[0].set_xlabel(r"$T$")
-ax[0].set_ylabel(r"$B_{4}$",rotation = 0, labelpad=labelpad)
+ax[0].set_ylabel(r"$m$",rotation = 0, labelpad=labelpad)
 ax[0].set_ylim(0,1)
 ax[0].legend(loc='upper right')
 
@@ -48,6 +48,6 @@ ax[1].set_ylim(0,1.6)
 ax[1].legend(loc='upper right')
 
 fig.tight_layout()
-
+plt.savefig('data_analytics/graphs/m.png')
 plt.show()
     
